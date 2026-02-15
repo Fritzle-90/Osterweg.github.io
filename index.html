@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title>Osterweg</title>
+  <title>Osterweg auf dem Finnenweg Besenfeld 2026</title>
   <meta name="theme-color" content="#1f6feb" />
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
@@ -31,8 +31,8 @@
 
 <body>
 <header>
-  <div style="font-size:18px;font-weight:800;">Osterweg</div>
-  <div class="small" style="color:#dbe9ff;">Station wählen → Audio abspielen (optional offline speichern)</div>
+  <div style="font-size:18px;font-weight:800;">Osterweg Besenfeld 2026</div>
+  <div class="small" style="color:#dbe9ff;">Station wählen → Audio abspielen</div>
 </header>
 
 <main>
@@ -42,15 +42,7 @@
     <div class="small" style="margin-top:8px;">Marker antippen, um Station zu sehen.</div>
   </div>
 
-  <div class="card">
-    <div class="title">Offline</div>
-    <button id="offlineBtn" class="btn">Audios offline bereitstellen</button>
-    <div id="offlineHint" class="small" style="margin-top:8px;">
-      Tipp: Einmal im WLAN drücken, dann funktionieren die MP3s auch ohne Empfang.
-    </div>
-  </div>
-
-  <div class="card">
+    <div class="card">
     <div class="title">Stationen</div>
     <div id="stations" class="stations"></div>
   </div>
@@ -62,7 +54,7 @@
   const STATIONS = [
     {
       id: 1,
-      title: "Einzug nach Jerusalem – Start",
+      title: "Station 1 - Einzug nach Jerusalem",
       text: "Jesus zieht mit einem Esel nach Jerusalem ein",
       lat: 48.590022,
       lng: 8.412674,
@@ -70,7 +62,7 @@
     },
     {
       id: 2,
-      title: "Verrat",
+      title: "Station 2 - Verrat",
       text: "Jesus wird verraten",
       lat: 48.590628,
       lng: 8.411801,
@@ -78,31 +70,31 @@
     },
     {
       id: 3,
-      title: "Abendmahl",
-      text: "Kurzer Text zur Station 2.",
+      title: "Station 3 - Abendmahl",
+      text: "Jesus feiert mit seinen Jüngern das letzte Abendmahl",
       lat: 48.590814,
       lng: 8.411072,
       audioUrl: "audio/station3.mp3"
     },
     {
       id: 4,
-      title: "Garten Gethsemane",
-      text: "Kurzer Text zur Station 2.",
+      title: "Station 4 - Garten Gethsemane",
+      text: "Jesus versucht die Jünger wach zu halten",
       lat: 48.590928,
       lng: 8.409903,
       audioUrl: "audio/station4.mp3"
     },
     {
       id: 5,
-      title: "Kreuzigung",
-      text: "Kurzer Text zur Station 5.",
+      title: "Station 5 - Kreuzigung",
+      text: "Jesus wird gekreuzigt",
       lat: 48.591990,
       lng: 8.409414,
       audioUrl: "audio/station2.mp3"
     },
     {
       id: 6,
-      title: "Grab",
+      title: "Station 6 - Grab",
       text: "Kurzer Text zur Station 2.",
       lat: 48.592696,
       lng: 8.408706,
@@ -110,7 +102,7 @@
     },
     {
       id: 7,
-      title: "Auferstehung",
+      title: "Station 7 - Auferstehung",
       text: "Kurzer Text zur Station 2.",
       lat: 48.593501,
       lng: 8.408949,
@@ -118,7 +110,7 @@
     },
     {
       id: 8,
-      title: "Abschluss",
+      title: "Station 8 - Abschluss",
       text: "Kurzer Text zur Station 8.",
       lat: 48.594593,
       lng: 8.408671,
@@ -201,6 +193,7 @@
 </script>
 </body>
 </html>
+
 
 
 
