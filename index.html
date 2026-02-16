@@ -5,195 +5,278 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <title>Osterweg auf dem Finnenweg Besenfeld 2026</title>
-  <meta name="theme-color" content="#1f6feb" />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="icons/icon-192.png" />
 
   <!-- Leaflet (Karte) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; margin: 0; background: #fafafa; }
-    header { padding: 14px 16px; background: #1f6feb; color: white; }
-    main { padding: 16px; display: grid; gap: 14px; max-width: 780px; margin: 0 auto; }
-    .card { background: white; border: 1px solid #e6e6e6; border-radius: 14px; padding: 12px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+    :root{
+      /* Farben passend zum Himmelsstürmer-Logo */
+      --brand: #1f6f7a;         /* Petrol/Teal */
+      --brandDark: #195b63;
+      --brandSubText: rgba(255,255,255,.85);
+
+      --bg: #fafafa;
+      --card: #ffffff;
+      --border: #e6e6e6;
+
+      --text: #0b1b1e;
+      --muted: #4b5b60;
+
+      --ring: rgba(31,111,122,.22);
+    }
+
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* Header mit Logo */
+    .app-header{
+      padding: 14px 16px;
+      background: linear-gradient(90deg, var(--brand) 0%, #2a8a96 100%);
+      color: white;
+      display:flex;
+      align-items:center;
+      gap: 12px;
+    }
+    .logo{
+      width: 46px;
+      height: 46px;
+      object-fit: contain;
+      border-radius: 12px;         /* abgerundet-eckig */
+      background: rgba(255,255,255,.16);
+      padding: 6px;
+    }
+    .app-title{
+      font-size:18px;
+      font-weight:800;
+      line-height:1.15;
+    }
+    .app-subtitle{
+      font-size:14px;
+      color: var(--brandSubText);
+    }
+
+    main {
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    }
+
     .stations { display: grid; gap: 10px; }
-    .small { color: #555; font-size: 14px; line-height: 1.3; }
-    .btn { background: #1f6feb; color: #fff; padding: 10px 12px; border: 0; border-radius: 10px; cursor: pointer; width: 100%; font-weight: 600; }
-    .btn:active { transform: translateY(1px); }
+
+    .small { color: var(--muted); font-size: 14px; line-height: 1.3; }
+
     #map { height: 320px; border-radius: 12px; overflow: hidden; }
+
     audio { width: 100%; margin-top: 10px; }
+
     .row { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; }
+
     .title { font-weight: 800; margin: 0 0 6px; }
+
+    /* Station cards + Active highlight */
+    .station-card{
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--card);
+      padding: 12px;
+      box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    }
+    .station-card.active{
+      border-color: var(--brand);
+      box-shadow: 0 0 0 4px var(--ring);
+    }
+    .badge{
+      white-space:nowrap;
+      color: var(--brand);
+      font-weight: 800;
+    }
   </style>
 </head>
 
 <body>
-<header>
-  <div style="font-size:18px;font-weight:800;">Osterweg Besenfeld 2026</div>
-  <div class="small" style="color:#dbe9ff;">Station wählen → Audio abspielen</div>
-</header>
+  <header class="app-header">
+    <!-- ✅ Logo-Datei hier ablegen: icons/himmelsstuermer.png -->
+    <img src="icons/himmelsstuermer.png" alt="Himmelsstürmer Treff" class="logo" />
+    <div>
+      <div class="app-title">Osterweg Besenfeld 2026</div>
+      <div class="app-subtitle">Station wählen → Audio abspielen</div>
+    </div>
+  </header>
 
-<main>
-  <div class="card">
-    <div class="title">Karte</div>
-    <div id="map"></div>
-    <div class="small" style="margin-top:8px;">Marker antippen, um Station zu sehen.</div>
-  </div>
+  <main>
+    <div class="card">
+      <div class="title">Karte</div>
+      <div id="map"></div>
+      <div class="small" style="margin-top:8px;">Marker antippen, um Station zu sehen.</div>
+    </div>
 
     <div class="card">
-    <div class="title">Stationen</div>
-    <div id="stations" class="stations"></div>
-  </div>
-</main>
+      <div class="title">Stationen</div>
+      <div id="stations" class="stations"></div>
+    </div>
+  </main>
 
-<script>
-  // ✅ HIER eure 8 Stationen eintragen:
-  // Koordinaten: Google Maps → Stelle lange antippen → Koordinaten kopieren
-  const STATIONS = [
-    {
-      id: 1,
-      title: "Station 1 - Einzug nach Jerusalem",
-      text: "Jesus zieht mit einem Esel nach Jerusalem ein",
-      lat: 48.590022,
-      lng: 8.412674,
-      audioUrl: "audio/station1.mp3"
-    },
-    {
-      id: 2,
-      title: "Station 2 - Verrat",
-      text: "Jesus wird verraten",
-      lat: 48.590628,
-      lng: 8.411801,
-      audioUrl: "audio/station2.mp3"
-    },
-    {
-      id: 3,
-      title: "Station 3 - Abendmahl",
-      text: "Jesus feiert mit seinen Jüngern das letzte Abendmahl",
-      lat: 48.590814,
-      lng: 8.411072,
-      audioUrl: "audio/station3.mp3"
-    },
-    {
-      id: 4,
-      title: "Station 4 - Garten Gethsemane",
-      text: "Jesus versucht die Jünger wach zu halten",
-      lat: 48.590928,
-      lng: 8.409903,
-      audioUrl: "audio/station4.mp3"
-    },
-    {
-      id: 5,
-      title: "Station 5 - Kreuzigung",
-      text: "Jesus wird gekreuzigt",
-      lat: 48.591990,
-      lng: 8.409414,
-      audioUrl: "audio/station2.mp3"
-    },
-    {
-      id: 6,
-      title: "Station 6 - Grab",
-      text: "Kurzer Text zur Station 2.",
-      lat: 48.592696,
-      lng: 8.408706,
-      audioUrl: "audio/station6.mp3"
-    },
-    {
-      id: 7,
-      title: "Station 7 - Auferstehung",
-      text: "Kurzer Text zur Station 2.",
-      lat: 48.593501,
-      lng: 8.408949,
-      audioUrl: "audio/station7.mp3"
-    },
-    {
-      id: 8,
-      title: "Station 8 - Abschluss",
-      text: "Kurzer Text zur Station 8.",
-      lat: 48.594593,
-      lng: 8.408671,
-      audioUrl: "audio/station8.mp3"
-    },
-    // ... bis Station 8
-  ];
+  <script>
+    // ✅ HIER eure 8 Stationen eintragen:
+    // Koordinaten: Google Maps → Stelle lange antippen → Koordinaten kopieren
+    const STATIONS = [
+      {
+        id: 1,
+        title: "Station 1 - Einzug nach Jerusalem",
+        text: "Jesus zieht mit einem Esel nach Jerusalem ein",
+        lat: 48.590022,
+        lng: 8.412674,
+        audioUrl: "audio/station1.mp3"
+      },
+      {
+        id: 2,
+        title: "Station 2 - Verrat",
+        text: "Jesus wird verraten",
+        lat: 48.590628,
+        lng: 8.411801,
+        audioUrl: "audio/station2.mp3"
+      },
+      {
+        id: 3,
+        title: "Station 3 - Abendmahl",
+        text: "Jesus feiert mit seinen Jüngern das letzte Abendmahl",
+        lat: 48.590814,
+        lng: 8.411072,
+        audioUrl: "audio/station3.mp3"
+      },
+      {
+        id: 4,
+        title: "Station 4 - Garten Gethsemane",
+        text: "Jesus versucht die Jünger wach zu halten",
+        lat: 48.590928,
+        lng: 8.409903,
+        audioUrl: "audio/station4.mp3"
+      },
+      {
+        id: 5,
+        title: "Station 5 - Kreuzigung",
+        text: "Jesus wird gekreuzigt",
+        lat: 48.591990,
+        lng: 8.409414,
+        audioUrl: "audio/station5.mp3"
+      },
+      {
+        id: 6,
+        title: "Station 6 - Grab",
+        text: "Jesus wird ins Grab gelegt",
+        lat: 48.592696,
+        lng: 8.408706,
+        audioUrl: "audio/station6.mp3"
+      },
+      {
+        id: 7,
+        title: "Station 7 - Auferstehung",
+        text: "Jesus ist auferstanden",
+        lat: 48.593501,
+        lng: 8.408949,
+        audioUrl: "audio/station7.mp3"
+      },
+      {
+        id: 8,
+        title: "Station 8 - Abschluss",
+        text: "Segen & Abschlussgedanke",
+        lat: 48.594593,
+        lng: 8.408671,
+        audioUrl: "audio/station8.mp3"
+      }
+    ];
 
-  // --- Liste rendern ---
-  const stationsEl = document.getElementById("stations");
+    // --- Liste rendern ---
+    const stationsEl = document.getElementById("stations");
 
-  function makeStationCard(st) {
-    const div = document.createElement("div");
-    div.className = "card";
-    div.innerHTML = `
-      <div class="row">
-        <div>
-          <div style="font-weight:800;">${st.title}</div>
-          <div class="small">${st.text}</div>
+    function makeStationCard(st) {
+      const div = document.createElement("div");
+      div.className = "station-card";
+      div.id = `station-${st.id}`;
+
+      div.innerHTML = `
+        <div class="row">
+          <div>
+            <div style="font-weight:800;">${st.title}</div>
+            <div class="small">${st.text}</div>
+          </div>
+          <div class="badge">#${st.id}</div>
         </div>
-        <div class="small" style="white-space:nowrap;color:#1f6feb;font-weight:700;">#${st.id}</div>
-      </div>
-      <audio controls preload="none" src="${st.audioUrl}"></audio>
-    `;
-    return div;
-  }
-
-  STATIONS.forEach(st => stationsEl.appendChild(makeStationCard(st)));
-
-  // --- Karte ---
-  const map = L.map('map');
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap'
-  }).addTo(map);
-
-  const latlngs = STATIONS
-    .filter(s => typeof s.lat === "number" && typeof s.lng === "number")
-    .map(s => [s.lat, s.lng]);
-
-  if (latlngs.length) {
-    map.fitBounds(latlngs, { padding: [20, 20] });
-
-    // Route Linie (Wegverlauf)
-    L.polyline(latlngs).addTo(map);
-
-    // Marker
-    STATIONS.forEach(st => {
-      if (typeof st.lat !== "number" || typeof st.lng !== "number") return;
-      L.marker([st.lat, st.lng]).addTo(map)
-        .bindPopup(`<b>${st.title}</b><br>${st.text}`);
-    });
-  } else {
-    // Fallback, falls noch keine Koordinaten eingetragen sind:
-    map.setView([52.52, 13.405], 13);
-  }
-
-  // --- PWA: Service Worker registrieren ---
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("service-worker.js");
-  }
-
-  // --- Offline Button: alle Audios einmalig cachen ---
-  const offlineBtn = document.getElementById("offlineBtn");
-  const offlineHint = document.getElementById("offlineHint");
-
-  offlineBtn.addEventListener("click", async () => {
-    if (!("serviceWorker" in navigator)) {
-      offlineHint.textContent = "Offline-Funktion nicht verfügbar.";
-      return;
+        <audio controls preload="none" src="${st.audioUrl}" data-station-id="${st.id}"></audio>
+      `;
+      return div;
     }
-    const reg = await navigator.serviceWorker.ready;
-    const urls = STATIONS.map(s => s.audioUrl).filter(Boolean);
 
-    reg.active?.postMessage({ type: "CACHE_ALL_AUDIO", urls });
+    STATIONS.forEach(st => stationsEl.appendChild(makeStationCard(st)));
 
-    offlineHint.textContent = "Download gestartet. Bitte WLAN anlassen, bis alles geladen ist.";
-  });
-</script>
+    // --- nur ein Audio gleichzeitig ---
+    const audios = () => Array.from(document.querySelectorAll("audio"));
+
+    document.addEventListener("play", (e) => {
+      if (e.target.tagName !== "AUDIO") return;
+      audios().forEach(a => { if (a !== e.target) a.pause(); });
+
+      const id = e.target.getAttribute("data-station-id");
+      if (id) setActiveStation(Number(id), { scroll: true });
+    }, true);
+
+    // --- Active-Station UI ---
+    function setActiveStation(id, { scroll } = { scroll: false }) {
+      document.querySelectorAll(".station-card").forEach(el => el.classList.remove("active"));
+      const card = document.getElementById(`station-${id}`);
+      if (card) {
+        card.classList.add("active");
+        if (scroll) card.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+
+    // --- Karte ---
+    const map = L.map('map');
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    const latlngs = STATIONS
+      .filter(s => typeof s.lat === "number" && typeof s.lng === "number")
+      .map(s => [s.lat, s.lng]);
+
+    if (latlngs.length) {
+      map.fitBounds(latlngs, { padding: [20, 20] });
+
+      // Route Linie (Wegverlauf) – in Brandfarbe
+      L.polyline(latlngs, { color: getComputedStyle(document.documentElement).getPropertyValue('--brand').trim(), weight: 4 })
+        .addTo(map);
+
+      // Marker
+      STATIONS.forEach(st => {
+        if (typeof st.lat !== "number" || typeof st.lng !== "number") return;
+
+        L.marker([st.lat, st.lng]).addTo(map)
+          .bindPopup(`<b>${st.title}</b><br>${st.text}`)
+          .on("click", () => setActiveStation(st.id, { scroll: true }));
+      });
+    } else {
+      // Fallback, falls noch keine Koordinaten eingetragen sind:
+      map.setView([52.52, 13.405], 13);
+    }
+  </script>
 </body>
 </html>
-
-
-
-
