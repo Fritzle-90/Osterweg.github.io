@@ -142,8 +142,8 @@
         text: "Jesus zieht mit einem Esel nach Jerusalem ein",
         lat: 48.590022,
         lng: 8.412674,
-        audioUrl: "audio/station1.mp3"
-        audioUrl: "audio/aufgabe1.mp3"
+        audioStory: "audio/station1.m4a",
+        audioTask: "audio/aufgabe1.m4a"
       },
       {
         id: 2,
@@ -151,7 +151,8 @@
         text: "Jesus wird verraten",
         lat: 48.590628,
         lng: 8.411801,
-        audioUrl: "audio/station2.mp3"
+        audioStory: "audio/station2.m4a",
+        audioTask: "audio/aufgabe2.m4a"
       },
       {
         id: 3,
@@ -159,7 +160,8 @@
         text: "Jesus feiert mit seinen Jüngern das letzte Abendmahl",
         lat: 48.590814,
         lng: 8.411072,
-        audioUrl: "audio/station3.mp3"
+        audioStory: "audio/station3.m4a",
+        audioTask: "audio/aufgabe3.m4a"
       },
       {
         id: 4,
@@ -167,7 +169,8 @@
         text: "Jesus versucht die Jünger wach zu halten",
         lat: 48.590928,
         lng: 8.409903,
-        audioUrl: "audio/station4.mp3"
+        audioStory: "audio/station4.m4a",
+        audioTask: "audio/aufgabe4.m4a"
       },
       {
         id: 5,
@@ -175,7 +178,8 @@
         text: "Jesus wird gekreuzigt",
         lat: 48.591990,
         lng: 8.409414,
-        audioUrl: "audio/station5.mp3"
+        audioStory: "audio/station5.m4a",
+        audioTask: "audio/aufgabe5.m4a"
       },
       {
         id: 6,
@@ -183,7 +187,8 @@
         text: "Jesus wird ins Grab gelegt",
         lat: 48.592696,
         lng: 8.408706,
-        audioUrl: "audio/station6.mp3"
+        audioStory: "audio/station6.m4a",
+        audioTask: "audio/aufgabe6.m4a"
       },
       {
         id: 7,
@@ -191,7 +196,8 @@
         text: "Jesus ist auferstanden",
         lat: 48.593501,
         lng: 8.408949,
-        audioUrl: "audio/station7.mp3"
+        audioStory: "audio/station7.m4a",
+        audioTask: "audio/aufgabe7.m4a"
       },
       {
         id: 8,
@@ -199,7 +205,8 @@
         text: "Segen & Abschlussgedanke",
         lat: 48.594593,
         lng: 8.408671,
-        audioUrl: "audio/station8.mp3"
+        audioStory: "audio/station8.m4a",
+        audioTask: "audio/aufgabe8.m4a"
       }
     ];
 
@@ -207,21 +214,32 @@
     const stationsEl = document.getElementById("stations");
 
     function makeStationCard(st) {
-      const div = document.createElement("div");
-      div.className = "station-card";
-      div.id = `station-${st.id}`;
+  const div = document.createElement("div");
+  div.className = "station-card";
+  div.id = `station-${st.id}`;
 
-      div.innerHTML = `
-        <div class="row">
-          <div>
-            <div style="font-weight:800;">${st.title}</div>
-            <div class="small">${st.text}</div>
-          </div>
-          <div class="badge">#${st.id}</div>
-        </div>
-        <audio controls preload="none" src="${st.audioUrl}" data-station-id="${st.id}"></audio>
-      `;
-      return div;
+  div.innerHTML = `
+    <div class="row">
+      <div>
+        <div style="font-weight:800;">${st.title}</div>
+        <div class="small">${st.text}</div>
+      </div>
+      <div class="badge">#${st.id}</div>
+    </div>
+
+    <div class="small" style="margin-top:10px; font-weight:700;">Geschichte</div>
+    <audio controls preload="none"
+      src="${st.audioStory || ""}"
+      data-station-id="${st.id}"
+      data-audio-kind="story"></audio>
+
+    <div class="small" style="margin-top:10px; font-weight:700;">Aufgabe</div>
+    <audio controls preload="none"
+      src="${st.audioTask || ""}"
+      data-station-id="${st.id}"
+      data-audio-kind="task"></audio>
+  `;
+  return div;
     }
 
     STATIONS.forEach(st => stationsEl.appendChild(makeStationCard(st)));
@@ -231,11 +249,15 @@
 
     document.addEventListener("play", (e) => {
       if (e.target.tagName !== "AUDIO") return;
-      audios().forEach(a => { if (a !== e.target) a.pause(); });
+
+      audios().forEach(a => {
+        if (a !== e.target) a.pause();
+      });
 
       const id = e.target.getAttribute("data-station-id");
       if (id) setActiveStation(Number(id), { scroll: true });
     }, true);
+
 
     // --- Active-Station UI ---
     function setActiveStation(id, { scroll } = { scroll: false }) {
@@ -281,4 +303,5 @@
   </script>
 </body>
 </html>
+
 
