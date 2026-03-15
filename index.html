@@ -12,8 +12,7 @@
 
   <style>
     :root{
-      /* Farben passend zum Himmelsstürmer-Logo */
-      --brand: #1f6f7a;         /* Petrol/Teal */
+      --brand: #1f6f7a;
       --brandDark: #195b63;
       --brandSubText: rgba(255,255,255,.85);
 
@@ -25,16 +24,18 @@
       --muted: #4b5b60;
 
       --ring: rgba(31,111,122,.22);
+      --soft: #eef7f8;
     }
 
+    * { box-sizing: border-box; }
+
     body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       margin: 0;
       background: var(--bg);
       color: var(--text);
     }
 
-    /* Header mit Logo */
     .app-header{
       padding: 14px 16px;
       background: linear-gradient(90deg, var(--brand) 0%, #2a8a96 100%);
@@ -43,19 +44,23 @@
       align-items:center;
       gap: 12px;
     }
+
     .logo{
       width: 46px;
       height: 46px;
       object-fit: contain;
-      border-radius: 12px;         /* abgerundet-eckig */
+      border-radius: 12px;
       background: rgba(255,255,255,.16);
       padding: 6px;
+      flex-shrink: 0;
     }
+
     .app-title{
       font-size:18px;
       font-weight:800;
       line-height:1.15;
     }
+
     .app-subtitle{
       font-size:14px;
       color: var(--brandSubText);
@@ -73,23 +78,50 @@
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 12px;
+      padding: 14px;
       box-shadow: 0 1px 2px rgba(0,0,0,.04);
     }
 
-    .stations { display: grid; gap: 10px; }
+    .welcome-card{
+      background: linear-gradient(180deg, #ffffff 0%, #f8fcfc 100%);
+    }
 
-    .small { color: var(--muted); font-size: 14px; line-height: 1.3; }
+    .stations {
+      display: grid;
+      gap: 10px;
+    }
 
-    #map { height: 320px; border-radius: 12px; overflow: hidden; }
+    .small {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.4;
+    }
 
-    audio { width: 100%; margin-top: 10px; }
+    #map {
+      height: 340px;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
 
-    .row { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; }
+    audio {
+      width: 100%;
+      margin-top: 8px;
+    }
 
-    .title { font-weight: 800; margin: 0 0 6px; }
+    .row {
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+    }
 
-    /* Station cards + Active highlight */
+    .title {
+      font-weight: 800;
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
     .station-card{
       border: 1px solid var(--border);
       border-radius: 14px;
@@ -97,44 +129,110 @@
       padding: 12px;
       box-shadow: 0 1px 2px rgba(0,0,0,.04);
     }
+
     .station-card.active{
       border-color: var(--brand);
       box-shadow: 0 0 0 4px var(--ring);
     }
+
     .badge{
       white-space:nowrap;
       color: var(--brand);
       font-weight: 800;
+    }
+
+    .audio-label{
+      margin-top: 12px;
+      font-weight: 700;
+      color: var(--brandDark);
+      font-size: 14px;
+    }
+
+    .nav-links{
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .nav-btn{
+      appearance: none;
+      border: 0;
+      background: var(--brand);
+      color: white;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .nav-btn.secondary{
+      background: #dfeef1;
+      color: var(--brandDark);
+    }
+
+    .hidden{
+      display: none !important;
+    }
+
+    .intro-box{
+      background: var(--soft);
+      border: 1px solid #d8ebee;
+      border-radius: 12px;
+      padding: 12px;
+      margin-top: 10px;
+    }
+
+    .intro-box p{
+      margin: 0 0 8px;
+    }
+
+    .intro-box p:last-child{
+      margin-bottom: 0;
     }
   </style>
 </head>
 
 <body>
   <header class="app-header">
-    <!-- ✅ Logo-Datei hier ablegen: icons/himmelsstuermer.png -->
     <img src="icons/himmelsstuermer.png" alt="Himmelsstürmer Treff" class="logo" />
     <div>
       <div class="app-title">Osterweg Besenfeld 2026</div>
-      <div class="app-subtitle">Station wählen → Audio abspielen</div>
+      <div class="app-subtitle" id="subtitle">Willkommen auf dem Osterweg</div>
     </div>
   </header>
 
   <main>
-    <div class="card">
-      <div class="title">Karte</div>
-      <div id="map"></div>
-      <div class="small" style="margin-top:8px;">Marker antippen, um Station zu sehen.</div>
+    <div class="card welcome-card" id="welcomeCard">
+      <div class="title" id="welcomeTitle">Willkommen</div>
+      <div class="small">
+        Schön, dass du da bist. Auf diesem Osterweg kannst du die Passions- und Ostergeschichte
+        Schritt für Schritt erleben.
+      </div>
+
+      <div class="intro-box">
+        <p><strong>So funktioniert's:</strong></p>
+        <p>Gehe den Weg von Station zu Station.</p>
+        <p>Höre dir an jeder Station zuerst die <strong>Geschichte</strong> an.</p>
+        <p>Danach kannst du die <strong>Aufgabe</strong> anhören und mitmachen.</p>
+      </div>
     </div>
 
-    <div class="card">
-      <div class="title">Stationen</div>
+    <div class="card" id="mapCard">
+      <div class="title" id="mapTitle">Plan / Karte</div>
+      <div class="small">Hier siehst du den Weg und alle Stationen.</div>
+      <div id="map"></div>
+      <div class="small" style="margin-top:8px;">Marker antippen, um eine Station in der Übersicht zu markieren.</div>
+    </div>
+
+    <div class="card" id="stationsCard">
+      <div class="title" id="stationsTitle">Alle Stationen</div>
       <div id="stations" class="stations"></div>
     </div>
   </main>
 
   <script>
-    // ✅ HIER eure 8 Stationen eintragen:
-    // Koordinaten: Google Maps → Stelle lange antippen → Koordinaten kopieren
     const STATIONS = [
       {
         id: 1,
@@ -157,7 +255,7 @@
       {
         id: 3,
         title: "Station 3 - Abendmahl",
-        text: "Jesus feiert mit seinen Freunden ein letzes Mal",
+        text: "Jesus feiert mit seinen Freunden ein letztes Mal",
         lat: 48.590814,
         lng: 8.411072,
         audioStory: "audio/station3.m4a",
@@ -166,7 +264,7 @@
       {
         id: 4,
         title: "Station 4 - Garten Gethsemane",
-        text: "Jesus geht mit seinen Freunden in Garten und betet",
+        text: "Jesus geht mit seinen Freunden in den Garten und betet",
         lat: 48.590928,
         lng: 8.409903,
         audioStory: "audio/station4.m4a",
@@ -210,41 +308,139 @@
       }
     ];
 
-    // --- Liste rendern ---
     const stationsEl = document.getElementById("stations");
+    const subtitleEl = document.getElementById("subtitle");
+    const welcomeCardEl = document.getElementById("welcomeCard");
+    const mapCardEl = document.getElementById("mapCard");
+    const stationsTitleEl = document.getElementById("stationsTitle");
+    const mapTitleEl = document.getElementById("mapTitle");
 
-    function makeStationCard(st) {
-  const div = document.createElement("div");
-  div.className = "station-card";
-  div.id = `station-${st.id}`;
+    const params = new URLSearchParams(window.location.search);
+    const stationParam = parseInt(params.get("station"), 10);
+    const singleStationMode = Number.isInteger(stationParam);
+    const selectedStation = STATIONS.find(st => st.id === stationParam);
 
-  div.innerHTML = `
-    <div class="row">
-      <div>
-        <div style="font-weight:800;">${st.title}</div>
-        <div class="small">${st.text}</div>
-      </div>
-      <div class="badge">#${st.id}</div>
-    </div>
+    function audioPlayerHtml(src, stationId, kind) {
+      if (!src) {
+        return `<div class="small">Für diesen Bereich ist noch keine Audio-Datei hinterlegt.</div>`;
+      }
 
-    <div class="small" style="margin-top:10px; font-weight:700;">Geschichte</div>
-    <audio controls preload="none"
-      src="${st.audioStory || ""}"
-      data-station-id="${st.id}"
-      data-audio-kind="story"></audio>
-
-    <div class="small" style="margin-top:10px; font-weight:700;">Aufgabe</div>
-    <audio controls preload="none"
-      src="${st.audioTask || ""}"
-      data-station-id="${st.id}"
-      data-audio-kind="task"></audio>
-  `;
-  return div;
+      return `
+        <audio
+          controls
+          preload="none"
+          src="${src}"
+          data-station-id="${stationId}"
+          data-audio-kind="${kind}"
+          controlsList="nodownload noplaybackrate"
+          disablePictureInPicture
+        ></audio>
+      `;
     }
 
-    STATIONS.forEach(st => stationsEl.appendChild(makeStationCard(st)));
+    function makeStationCard(st, isSingleMode = false) {
+      const div = document.createElement("div");
+      div.className = "station-card";
+      div.id = `station-${st.id}`;
 
-    // --- nur ein Audio gleichzeitig ---
+      const navHtml = isSingleMode ? `
+        <div class="nav-links">
+          ${st.id > 1 ? `<a class="nav-btn secondary" href="?station=${st.id - 1}">← Vorherige Station</a>` : ""}
+          ${st.id < STATIONS.length ? `<a class="nav-btn" href="?station=${st.id + 1}">Nächste Station →</a>` : ""}
+          <a class="nav-btn secondary" href="./">Zur Startseite</a>
+        </div>
+      ` : `
+        <div class="nav-links">
+          <a class="nav-btn secondary" href="?station=${st.id}">Einzelansicht öffnen</a>
+        </div>
+      `;
+
+      div.innerHTML = `
+        <div class="row">
+          <div>
+            <div style="font-weight:800;">${st.title}</div>
+            <div class="small">${st.text}</div>
+          </div>
+          <div class="badge">#${st.id}</div>
+        </div>
+
+        <div class="audio-label">Geschichte</div>
+        ${audioPlayerHtml(st.audioStory, st.id, "story")}
+
+        <div class="audio-label">Aufgabe</div>
+        ${audioPlayerHtml(st.audioTask, st.id, "task")}
+
+        ${navHtml}
+      `;
+
+      return div;
+    }
+
+    function setActiveStation(id, { scroll } = { scroll: false }) {
+      document.querySelectorAll(".station-card").forEach(el => el.classList.remove("active"));
+      const card = document.getElementById(`station-${id}`);
+      if (card) {
+        card.classList.add("active");
+        if (scroll) {
+          card.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }
+    }
+
+    function renderOverview() {
+      subtitleEl.textContent = "Willkommen auf dem Osterweg";
+      stationsTitleEl.textContent = "Alle Stationen";
+      mapTitleEl.textContent = "Plan / Karte";
+      document.title = "Osterweg Besenfeld 2026";
+
+      STATIONS.forEach(st => {
+        stationsEl.appendChild(makeStationCard(st, false));
+      });
+    }
+
+    function renderSingleStation(st) {
+      subtitleEl.textContent = st.title;
+      document.title = `${st.title} | Osterweg Besenfeld 2026`;
+
+      welcomeCardEl.classList.add("hidden");
+      mapCardEl.classList.add("hidden");
+      stationsTitleEl.textContent = "Station";
+
+      stationsEl.appendChild(makeStationCard(st, true));
+      setActiveStation(st.id, { scroll: false });
+    }
+
+    function renderNotFound() {
+      subtitleEl.textContent = "Station nicht gefunden";
+      document.title = "Station nicht gefunden | Osterweg Besenfeld 2026";
+
+      welcomeCardEl.classList.add("hidden");
+      mapCardEl.classList.add("hidden");
+      stationsTitleEl.textContent = "Hinweis";
+
+      const div = document.createElement("div");
+      div.className = "station-card";
+      div.innerHTML = `
+        <div style="font-weight:800; margin-bottom:8px;">Diese Station wurde nicht gefunden.</div>
+        <div class="small">Bitte prüfe den QR-Code oder gehe zurück zur Startseite.</div>
+        <div class="nav-links">
+          <a class="nav-btn" href="./">Zur Startseite</a>
+        </div>
+      `;
+      stationsEl.appendChild(div);
+    }
+
+    if (singleStationMode) {
+      if (selectedStation) {
+        renderSingleStation(selectedStation);
+      } else {
+        renderNotFound();
+      }
+    } else {
+      renderOverview();
+    }
+
+    // immer nur ein Audio gleichzeitig
     const audios = () => Array.from(document.querySelectorAll("audio"));
 
     document.addEventListener("play", (e) => {
@@ -255,54 +451,48 @@
       });
 
       const id = e.target.getAttribute("data-station-id");
-      if (id) setActiveStation(Number(id), { scroll: true });
+      if (id) setActiveStation(Number(id), { scroll: !singleStationMode });
     }, true);
 
-
-    // --- Active-Station UI ---
-    function setActiveStation(id, { scroll } = { scroll: false }) {
-      document.querySelectorAll(".station-card").forEach(el => el.classList.remove("active"));
-      const card = document.getElementById(`station-${id}`);
-      if (card) {
-        card.classList.add("active");
-        if (scroll) card.scrollIntoView({ behavior: "smooth", block: "start" });
+    // Rechtsklick auf Audio blockieren
+    document.addEventListener("contextmenu", (e) => {
+      if (e.target.tagName === "AUDIO") {
+        e.preventDefault();
       }
-    }
+    });
 
-    // --- Karte ---
-    const map = L.map('map');
+    // Karte nur in der Übersicht anzeigen
+    if (!singleStationMode) {
+      const map = L.map("map");
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap'
-    }).addTo(map);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap"
+      }).addTo(map);
 
-    const latlngs = STATIONS
-      .filter(s => typeof s.lat === "number" && typeof s.lng === "number")
-      .map(s => [s.lat, s.lng]);
+      const latlngs = STATIONS
+        .filter(s => typeof s.lat === "number" && typeof s.lng === "number")
+        .map(s => [s.lat, s.lng]);
 
-    if (latlngs.length) {
-      map.fitBounds(latlngs, { padding: [20, 20] });
+      if (latlngs.length) {
+        map.fitBounds(latlngs, { padding: [20, 20] });
 
-      // Route Linie (Wegverlauf) – in Brandfarbe
-      L.polyline(latlngs, { color: getComputedStyle(document.documentElement).getPropertyValue('--brand').trim(), weight: 4 })
-        .addTo(map);
+        L.polyline(latlngs, {
+          color: getComputedStyle(document.documentElement).getPropertyValue("--brand").trim(),
+          weight: 4
+        }).addTo(map);
 
-      // Marker
-      STATIONS.forEach(st => {
-        if (typeof st.lat !== "number" || typeof st.lng !== "number") return;
+        STATIONS.forEach(st => {
+          if (typeof st.lat !== "number" || typeof st.lng !== "number") return;
 
-        L.marker([st.lat, st.lng]).addTo(map)
-          .bindPopup(`<b>${st.title}</b><br>${st.text}`)
-          .on("click", () => setActiveStation(st.id, { scroll: true }));
-      });
-    } else {
-      // Fallback, falls noch keine Koordinaten eingetragen sind:
-      map.setView([52.52, 13.405], 13);
+          L.marker([st.lat, st.lng]).addTo(map)
+            .bindPopup(`<b>${st.title}</b><br>${st.text}<br><br><a href="?station=${st.id}">Station öffnen</a>`)
+            .on("click", () => setActiveStation(st.id, { scroll: true }));
+        });
+      } else {
+        map.setView([52.52, 13.405], 13);
+      }
     }
   </script>
 </body>
 </html>
-
-
-
