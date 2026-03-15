@@ -86,11 +86,6 @@
       background: linear-gradient(180deg, #ffffff 0%, #f8fcfc 100%);
     }
 
-    .stations {
-      display: grid;
-      gap: 10px;
-    }
-
     .small {
       color: var(--muted);
       font-size: 14px;
@@ -205,7 +200,7 @@
 
   <main>
     <div class="card welcome-card" id="welcomeCard">
-      <div class="title" id="welcomeTitle">Willkommen</div>
+      <div class="title">Willkommen</div>
       <div class="small">
         Schön, dass du da bist. Auf diesem Osterweg kannst du die Passions- und Ostergeschichte
         Schritt für Schritt erleben.
@@ -214,21 +209,22 @@
       <div class="intro-box">
         <p><strong>So funktioniert's:</strong></p>
         <p>Gehe den Weg von Station zu Station.</p>
-        <p>Höre dir an jeder Station zuerst die <strong>Geschichte</strong> an.</p>
+        <p>Scanne an jeder Station den QR-Code.</p>
+        <p>Höre dir zuerst die <strong>Geschichte</strong> an.</p>
         <p>Danach kannst du die <strong>Aufgabe</strong> anhören und mitmachen.</p>
       </div>
     </div>
 
     <div class="card" id="mapCard">
       <div class="title" id="mapTitle">Plan / Karte</div>
-      <div class="small">Hier siehst du den Weg und alle Stationen.</div>
+      <div class="small">Hier siehst du den Weg des Osterwegs.</div>
       <div id="map"></div>
-      <div class="small" style="margin-top:8px;">Marker antippen, um eine Station in der Übersicht zu markieren.</div>
+      <div class="small" style="margin-top:8px;">Die Inhalte der Stationen öffnest du über die QR-Codes vor Ort.</div>
     </div>
 
-    <div class="card" id="stationsCard">
-      <div class="title" id="stationsTitle">Alle Stationen</div>
-      <div id="stations" class="stations"></div>
+    <div class="card hidden" id="stationCard">
+      <div class="title" id="stationTitle">Station</div>
+      <div id="stationContent"></div>
     </div>
   </main>
 
@@ -308,12 +304,12 @@
       }
     ];
 
-    const stationsEl = document.getElementById("stations");
     const subtitleEl = document.getElementById("subtitle");
     const welcomeCardEl = document.getElementById("welcomeCard");
     const mapCardEl = document.getElementById("mapCard");
-    const stationsTitleEl = document.getElementById("stationsTitle");
-    const mapTitleEl = document.getElementById("mapTitle");
+    const stationCardEl = document.getElementById("stationCard");
+    const stationTitleEl = document.getElementById("stationTitle");
+    const stationContentEl = document.getElementById("stationContent");
 
     const params = new URLSearchParams(window.location.search);
     const stationParam = parseInt(params.get("station"), 10);
@@ -338,64 +334,35 @@
       `;
     }
 
-    function makeStationCard(st, isSingleMode = false) {
-      const div = document.createElement("div");
-      div.className = "station-card";
-      div.id = `station-${st.id}`;
-
-      const navHtml = isSingleMode ? `
-        <div class="nav-links">
-          ${st.id > 1 ? `<a class="nav-btn secondary" href="?station=${st.id - 1}">← Vorherige Station</a>` : ""}
-          ${st.id < STATIONS.length ? `<a class="nav-btn" href="?station=${st.id + 1}">Nächste Station →</a>` : ""}
-          <a class="nav-btn secondary" href="./">Zur Startseite</a>
-        </div>
-      ` : `
-        <div class="nav-links">
-          <a class="nav-btn secondary" href="?station=${st.id}">Einzelansicht öffnen</a>
-        </div>
-      `;
-
-      div.innerHTML = `
-        <div class="row">
-          <div>
-            <div style="font-weight:800;">${st.title}</div>
-            <div class="small">${st.text}</div>
+    function makeSingleStationContent(st) {
+      return `
+        <div class="station-card active" id="station-${st.id}">
+          <div class="row">
+            <div>
+              <div style="font-weight:800;">${st.title}</div>
+              <div class="small">${st.text}</div>
+            </div>
+            <div class="badge">#${st.id}</div>
           </div>
-          <div class="badge">#${st.id}</div>
+
+          <div class="audio-label">Geschichte</div>
+          ${audioPlayerHtml(st.audioStory, st.id, "story")}
+
+          <div class="audio-label">Aufgabe</div>
+          ${audioPlayerHtml(st.audioTask, st.id, "task")}
+
+          <div class="nav-links">
+            ${st.id > 1 ? `<a class="nav-btn secondary" href="?station=${st.id - 1}">← Vorherige Station</a>` : ""}
+            ${st.id < STATIONS.length ? `<a class="nav-btn" href="?station=${st.id + 1}">Nächste Station →</a>` : ""}
+            <a class="nav-btn secondary" href="./">Zur Startseite</a>
+          </div>
         </div>
-
-        <div class="audio-label">Geschichte</div>
-        ${audioPlayerHtml(st.audioStory, st.id, "story")}
-
-        <div class="audio-label">Aufgabe</div>
-        ${audioPlayerHtml(st.audioTask, st.id, "task")}
-
-        ${navHtml}
       `;
-
-      return div;
-    }
-
-    function setActiveStation(id, { scroll } = { scroll: false }) {
-      document.querySelectorAll(".station-card").forEach(el => el.classList.remove("active"));
-      const card = document.getElementById(`station-${id}`);
-      if (card) {
-        card.classList.add("active");
-        if (scroll) {
-          card.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-      }
     }
 
     function renderOverview() {
       subtitleEl.textContent = "Willkommen auf dem Osterweg";
-      stationsTitleEl.textContent = "Alle Stationen";
-      mapTitleEl.textContent = "Plan / Karte";
       document.title = "Osterweg Besenfeld 2026";
-
-      STATIONS.forEach(st => {
-        stationsEl.appendChild(makeStationCard(st, false));
-      });
     }
 
     function renderSingleStation(st) {
@@ -404,10 +371,10 @@
 
       welcomeCardEl.classList.add("hidden");
       mapCardEl.classList.add("hidden");
-      stationsTitleEl.textContent = "Station";
+      stationCardEl.classList.remove("hidden");
 
-      stationsEl.appendChild(makeStationCard(st, true));
-      setActiveStation(st.id, { scroll: false });
+      stationTitleEl.textContent = "Station";
+      stationContentEl.innerHTML = makeSingleStationContent(st);
     }
 
     function renderNotFound() {
@@ -416,18 +383,18 @@
 
       welcomeCardEl.classList.add("hidden");
       mapCardEl.classList.add("hidden");
-      stationsTitleEl.textContent = "Hinweis";
+      stationCardEl.classList.remove("hidden");
 
-      const div = document.createElement("div");
-      div.className = "station-card";
-      div.innerHTML = `
-        <div style="font-weight:800; margin-bottom:8px;">Diese Station wurde nicht gefunden.</div>
-        <div class="small">Bitte prüfe den QR-Code oder gehe zurück zur Startseite.</div>
-        <div class="nav-links">
-          <a class="nav-btn" href="./">Zur Startseite</a>
+      stationTitleEl.textContent = "Hinweis";
+      stationContentEl.innerHTML = `
+        <div class="station-card active">
+          <div style="font-weight:800; margin-bottom:8px;">Diese Station wurde nicht gefunden.</div>
+          <div class="small">Bitte prüfe den QR-Code oder gehe zurück zur Startseite.</div>
+          <div class="nav-links">
+            <a class="nav-btn" href="./">Zur Startseite</a>
+          </div>
         </div>
       `;
-      stationsEl.appendChild(div);
     }
 
     if (singleStationMode) {
@@ -449,9 +416,6 @@
       audios().forEach(a => {
         if (a !== e.target) a.pause();
       });
-
-      const id = e.target.getAttribute("data-station-id");
-      if (id) setActiveStation(Number(id), { scroll: !singleStationMode });
     }, true);
 
     // Rechtsklick auf Audio blockieren
@@ -486,8 +450,7 @@
           if (typeof st.lat !== "number" || typeof st.lng !== "number") return;
 
           L.marker([st.lat, st.lng]).addTo(map)
-            .bindPopup(`<b>${st.title}</b><br>${st.text}<br><br><a href="?station=${st.id}">Station öffnen</a>`)
-            .on("click", () => setActiveStation(st.id, { scroll: true }));
+            .bindPopup(`<b>${st.title}</b><br>${st.text}`);
         });
       } else {
         map.setView([52.52, 13.405], 13);
