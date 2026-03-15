@@ -186,6 +186,26 @@
     .intro-box p:last-child{
       margin-bottom: 0;
     }
+
+    .map-popup-title{
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .map-popup-text{
+      margin-bottom: 10px;
+      line-height: 1.35;
+    }
+
+    .map-popup-link{
+      display: inline-block;
+      background: var(--brand);
+      color: white;
+      text-decoration: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-weight: 700;
+    }
   </style>
 </head>
 
@@ -209,17 +229,17 @@
       <div class="intro-box">
         <p><strong>So funktioniert's:</strong></p>
         <p>Gehe den Weg von Station zu Station.</p>
-        <p>Scanne an jeder Station den QR-Code.</p>
+        <p>Scanne an jeder Station den QR-Code oder öffne die Station über die Karte.</p>
         <p>Höre dir zuerst die <strong>Geschichte</strong> an.</p>
         <p>Danach kannst du die <strong>Aufgabe</strong> anhören und mitmachen.</p>
       </div>
     </div>
 
     <div class="card" id="mapCard">
-      <div class="title" id="mapTitle">Plan / Karte</div>
+      <div class="title">Plan / Karte</div>
       <div class="small">Hier siehst du den Weg des Osterwegs.</div>
       <div id="map"></div>
-      <div class="small" style="margin-top:8px;">Die Inhalte der Stationen öffnest du über die QR-Codes vor Ort.</div>
+      <div class="small" style="margin-top:8px;">Tippe auf einen Pin, um die passende Station zu öffnen.</div>
     </div>
 
     <div class="card hidden" id="stationCard">
@@ -450,7 +470,13 @@
           if (typeof st.lat !== "number" || typeof st.lng !== "number") return;
 
           L.marker([st.lat, st.lng]).addTo(map)
-            .bindPopup(`<b>${st.title}</b><br>${st.text}`);
+            .bindPopup(`
+              <div style="min-width:180px;">
+                <div class="map-popup-title">${st.title}</div>
+                <div class="map-popup-text">${st.text}</div>
+                <a href="?station=${st.id}" class="map-popup-link">Station öffnen</a>
+              </div>
+            `);
         });
       } else {
         map.setView([52.52, 13.405], 13);
