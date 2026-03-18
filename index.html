@@ -206,6 +206,27 @@
       border-radius: 8px;
       font-weight: 700;
     }
+
+    .footer{
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+      padding: 10px 16px 28px;
+    }
+
+    .footer a{
+      color: var(--brand);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .footer a:hover{
+      text-decoration: underline;
+    }
+
+    .footer .footer-note{
+      margin-bottom: 6px;
+    }
   </style>
 </head>
 
@@ -248,6 +269,13 @@
       <div id="stationContent"></div>
     </div>
   </main>
+
+  <footer class="footer">
+    <div class="footer-note">Ein Angebot der Evangelischen Kirchengemeinde Seewald</div>
+    <a href="https://www.ev-kirche-seewald.de/meta/impressum" target="_blank" rel="noopener noreferrer">Impressum</a>
+    <span> · </span>
+    <a href="https://www.ev-kirche-seewald.de/meta/datenschutz" target="_blank" rel="noopener noreferrer">Datenschutz</a>
+  </footer>
 
   <script>
     const STATIONS = [
